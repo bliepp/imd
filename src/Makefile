@@ -1832,7 +1832,7 @@ endif
 ifneq (,${CC})
 	./version.sh
 	@echo \#define COMPILE_TARGET \"$@\" >> version.h
-	${MAKE} MAKETARGET='$@' STAGE2
+	${MAKE} MAKETARGET='fabio_$@' STAGE2
 else
 ifneq (,${IMDSYS})
 	@echo "IMDSYS variable ${IMDSYS} is not recognized"
