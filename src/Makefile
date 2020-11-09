@@ -135,6 +135,34 @@ KIM_DIR 	= /data/daniel/openkim/openkim-api
 
 ###########################################################################
 #
+#  custom flags by dklein
+#
+###########################################################################
+
+ifeq (HLRS,${IMDSYS})
+  CC_SERIAL     = mpicc
+  CC_MPI        = mpicc
+  CC_OMP        = mpicc
+  CC_OMPI       = mpicc
+  MPICH_CC      = mpicc
+  MPICH_CLINKER = mpicc
+  OMPI_MPICC    = mpicc
+  BIN_DIR       = ${HOME}/bin/imd
+  MPI_FLAGS     +=
+  OPT_FLAGS     += -O0
+  OMP_FLAGS     += #-mp
+  OMPI_FLAGS    += #-mp
+  LFLAGS        += #-O2 -L/zhome/academic/HLRS/ita/itaklein/bin/gsl/lib
+  DEBUG_FLAGS   += #-g
+  PROF_FLAGS    +=
+  FLAGS +=
+  RCD_FLAGS     += # -DRCD -rcd
+  MPI_LIBS      +=
+  export        OMPI_MPICC MPICH_CC MPICH_CLINKER
+endif
+
+###########################################################################
+#
 #  flags for IA32-Linux
 #
 ###########################################################################
