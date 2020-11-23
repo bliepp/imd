@@ -2025,27 +2025,36 @@ void move_atoms_frac(void)
 
     /* loop over all atoms in the cell */
     for (i=0; i<p->n; ++i) {
+	/* MYMOD DKLEINMOD STADIUM */
 	
-	/* if half axis in x-direction is zero: global viscous damping ! */
-	if(stadium.x <= 0.0) { 
-	    f = 1.0; 
+	// instead of using a "real" stadium the stadium feature is used
+	// for vertical separation of nve and nvt ensembles
+	if(stadium.x <= ORT(p,i,Z) ) {
+		f = 0.0;
 	} else {
-	    /* Calculate stadium function f */
-	    tmp1 = SQR((ORT(p,i,X)-center.x)/(2.0*stadium2.x));
-	    tmp2 = SQR((ORT(p,i,Y)-center.y)/(2.0*stadium2.y));
-	    f    = (tmp1+tmp2-SQR(stadium.x/(2.0*stadium2.x)))/\
-		(.25- SQR(stadium.x/(2.0*stadium2.x)));
+		f = 1.0;
 	}
-	
-	if (f<= 0.0) {
-	    f = 0.0;
-	    n_stadium += DIM;
-	    /* what about the restrictions?? */
-	}
-	if (f>1.0) f = 1.0;
 
-        /* we smooth the stadium function: to get a real bath tub !*/  
-	f    = .5 * (1 + sin(-M_PI/2.0 + M_PI*f));
+//	/* if half axis in x-direction is zero: global viscous damping ! */
+//	if(stadium.x <= 0.0) {
+//	    f = 1.0;
+//	} else {
+//	    /* Calculate stadium function f */
+//	    tmp1 = SQR((ORT(p,i,X)-center.x)/(2.0*stadium2.x));
+//	    tmp2 = SQR((ORT(p,i,Y)-center.y)/(2.0*stadium2.y));
+//	    f    = (tmp1+tmp2-SQR(stadium.x/(2.0*stadium2.x)))/\
+//		(.25- SQR(stadium.x/(2.0*stadium2.x)));
+//	}
+//
+//	if (f<= 0.0) {
+//	    f = 0.0;
+//	    n_stadium += DIM;
+//	    /* what about the restrictions?? */
+//	}
+//	if (f>1.0) f = 1.0;
+//
+//	/* we smooth the stadium function: to get a real bath tub !*/
+//	f    = .5 * (1 + sin(-M_PI/2.0 + M_PI*f));
 
 	sort = VSORTE(p,i);
         /* add up f considering the restriction vector  */
