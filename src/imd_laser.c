@@ -528,16 +528,27 @@ void laser_rescale_1()
       double x = ORT(p,i,X);
       double y = ORT(p,i,Y);
       double z = ORT(p,i,Z);
-   
       
-     
       de = exp( -laser_mu*depth ) * exp_gauss_time_etc * laser_intensity_profile(x,y,z);     
-  
-    
 
 #else
-      de = exp(-laser_mu*depth) * exp_gauss_time_etc;
-       
+      /* MYMOD DKLEIN LASER */
+      //de = exp(-laser_mu*depth) * exp_gauss_time_etc;
+      double FWHM = 400;
+      double vx   = 0.005; // angstrom per timestep 
+      double x_start = 0;
+      double y_start = 750;
+      double z_start = 750;
+      
+      double x = ORT(p,i,X);
+      double y = ORT(p,i,Y);
+      double z = ORT(p,i,Z);
+      
+      depth = (laser_offset-z);
+      double sigma_scale = FWHM*FWHM / (4.0 *  0.693);
+      double xsquare = ( (x-x_start-vx*steps)*(x-x_start-vx*steps) + (y-y_start)*(y-y_start) );
+      de = exp( -laser_mu*depth ) * exp( - xsquare / sigma_scale ) * laser_p_peak * timestep * laser_atom_vol;
+      
 #endif         
 
        if ( p_0_square == 0.0 ) { /* we need a direction for the momentum. */
