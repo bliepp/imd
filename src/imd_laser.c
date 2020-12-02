@@ -537,8 +537,8 @@ void laser_rescale_1()
       double FWHM = 400;
       double vx   = 0.005; // angstrom per timestep 
       double x_start = 0;
-      double y_start = 750;
-      double z_start = 750;
+      double y_start = 242;//750;
+      double z_start = 242;//750;
       
       double x = ORT(p,i,X);
       double y = ORT(p,i,Y);
