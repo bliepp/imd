@@ -349,12 +349,13 @@ void move_atoms_nve(void)
       }
 #endif
       
+      /* MYMOD restricting particles in position change, this time for real */
       /* new positions */
       tmp = timestep / MASSE(p,i);
-      ORT(p,i,X) += tmp * IMPULS(p,i,X);
-      ORT(p,i,Y) += tmp * IMPULS(p,i,Y);
+      ORT(p,i,X) += tmp * IMPULS(p,i,X)*(restrictions + sort)->x;
+      ORT(p,i,Y) += tmp * IMPULS(p,i,Y)*(restrictions + sort)->y;
 #ifndef TWOD
-      ORT(p,i,Z) += tmp * IMPULS(p,i,Z);
+      ORT(p,i,Z) += tmp * IMPULS(p,i,Z)*(restrictions + sort)->z;
 #endif
 
 #ifdef RELAXINFO
