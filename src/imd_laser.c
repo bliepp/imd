@@ -280,8 +280,13 @@ void init_laser()
 #ifdef LASERYZ
   laser_p_peak0=laser_mu*laser_sigma_e/laser_sigma_t/sqrt(2*M_PI);
   //printf("ppeak: %f mu: %f se: %f", laser_p_peak, laser_mu, laser_sigma_e);
-#else  
+#else
+#ifdef SLM
+   /* MYMOD FABIO PEAK PRECALCULATION */
+   laser_p_peak = (1.0 - laser_reflectivity) * laser_mu * laser_power / M_PI;
+#else
    laser_p_peak=laser_mu*laser_sigma_e/laser_sigma_t/sqrt(2*M_PI); 
+#endif
 #endif
   laser_sigma_t_squared=laser_sigma_t*laser_sigma_t;
 
@@ -532,23 +537,29 @@ void laser_rescale_1()
       de = exp( -laser_mu*depth ) * exp_gauss_time_etc * laser_intensity_profile(x,y,z);     
 
 #else
-      /* MYMOD DKLEIN LASER */
-      //de = exp(-laser_mu*depth) * exp_gauss_time_etc;
-      double FWHM = 400;
-      double vx   = 0.005; // angstrom per timestep 
-      double x_start = 0;
-      double y_start = 725.775;//242;//750;
-      double z_start = 725.775;//242;//750;
+#ifdef SLM
+      /* MYMOD FABIO LASER CALCULATION */
+
+      double x = ORT(p,i,X) - laser_start_position.x - laser_velocity.x*timestep*steps,
+             y = ORT(p,i,Y) - laser_start_position.y - laser_velocity.y*timestep*steps,
+             z = ORT(p,i,Z);
       
-      double x = ORT(p,i,X);
-      double y = ORT(p,i,Y);
-      double z = ORT(p,i,Z);
-      
-      depth = (laser_offset-z);
-      double sigma_scale = FWHM*FWHM / (4.0 *  0.693);
-      double xsquare = ( (x-x_start-vx*steps)*(x-x_start-vx*steps) + (y-y_start)*(y-y_start) );
-      de = exp( -laser_mu*depth ) * exp( - xsquare / sigma_scale ) * laser_p_peak * timestep * laser_atom_vol;
-      
+      double inv_sigma_scale_square = 2.773/(laser_fwhm*laser_fwhm); // => 4*ln(2) / FWMH^2
+
+      de = exp(-laser_mu * (laser_offset-z)) * inv_sigma_scale_square * exp(-(x*x + y*y)*inv_sigma_scale_square) * laser_p_peak * laser_atom_vol * timestep;
+
+      /* DKLEIN MOD */
+      //depth = (laser_offset-z);
+      //double sigma_scale = laser_fwhm*laser_fwhm / (4.0 *  0.693);
+      //double xsquare = ( (x-x_start-vx*steps)*(x-x_start-vx*steps) + (y-y_start)*(y-y_start) );
+      //de = exp( -laser_mu*depth ) * exp( - xsquare / sigma_scale ) * laser_p_peak * timestep * laser_atom_vol;
+      // line 284: laser_p_peak=laser_mu*laser_sigma_e/laser_sigma_t/sqrt(2*M_PI);
+      // sigme_e: fluence -> eV/Ang^ 2
+      // sigma_t: half dur. of laser pulse = 1/2
+
+#else
+      de = exp(-laser_mu*depth) * exp_gauss_time_etc;
+#endif
 #endif         
 
        if ( p_0_square == 0.0 ) { /* we need a direction for the momentum. */

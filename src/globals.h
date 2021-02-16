@@ -963,6 +963,15 @@ EXTERN real laser_p_peak1  INIT(0.0);   /* Peak power density (calculated in imd
 EXTERN real laser_atom_vol INIT(16.6);  /* Volume per particle (inverse density) ATTENTION: THIS VALUE IS VOR ALUMINUM ONLY*/
 EXTERN int  laser_rescale_mode INIT(1); /* Mode for laser velocity rescaling */
 
+#ifdef SLM
+/* MYMOD FABIO LASER PARAMS */
+EXTERN real laser_fwhm	  INIT(400.0);   /* spot size */
+EXTERN real laser_power	  INIT(0.0);   /* total laser power */
+EXTERN real laser_reflectivity	  INIT(0.0);   /* How much the lase gets reflected */
+EXTERN vektor2d laser_start_position  INIT(nullvektor2d); /* laser movement start position */
+EXTERN vektor2d laser_velocity  INIT(nullvektor2d); /* laser movement */
+#endif
+
 #ifdef LASERYZ
 EXTERN real laser_sigma_w_y INIT(0.0); /* y-center of gaussian laser-pulse  */
 EXTERN real laser_sigma_w_z INIT(0.0); /* z-center of gaussian laser-pulse  */

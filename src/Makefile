@@ -153,7 +153,7 @@ ifeq (HLRS,${IMDSYS})
   OMP_FLAGS     += #-mp
   OMPI_FLAGS    += #-mp
   LFLAGS        += #-O2 -L/zhome/academic/HLRS/ita/itaklein/bin/gsl/lib
-  DEBUG_FLAGS   += #-g
+  DEBUG_FLAGS   += -g
   PROF_FLAGS    +=
   FLAGS +=
   RCD_FLAGS     += # -DRCD -rcd
@@ -1297,13 +1297,17 @@ ifneq (,$(strip $(findstring laseryz,${MAKETARGET})))
 		CFLAGS += -DLASERYZ -DLASER
 		SOURCES += ${LASERSOURCES}
 	else
-	       	CFLAGS += -DLASERYZ -DLASER
+	    CFLAGS += -DLASERYZ -DLASER
 		SOURCES += ${LASERSOURCES}
 	endif
 else
 	ifneq (,$(strip $(findstring laser,${MAKETARGET})))
 		PP_FLAGS += -DLASER
 		SOURCES += ${LASERSOURCES}
+		ifneq (,$(strip $(findstring slm,${MAKETARGET})))
+			# MYMOD FABIO SLM COMPILE FLAG
+			PP_FLAGS += -DSLM
+		endif
 	endif
 endif
 

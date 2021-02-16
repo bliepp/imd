@@ -2039,6 +2039,31 @@ else if (strcasecmp(token, "laser_dir")==0){
        ( for now only along coordinate axes ) (always needed)*/
       getparam("laser_dir", &laser_dir, PARAM_INT, DIM, DIM);
     }
+
+#ifdef SLM
+/* MYMOD FABIO LASER PARAMS */
+else if (strcasecmp(token, "laser_fwhm")==0){
+      /* fwhm of the gauss profile -> spot size in angstrom */
+      getparam("laser_fwhm", &laser_fwhm, PARAM_REAL, 1,1); // equal 0.0 gets fetched later
+    }
+else if (strcasecmp(token, "laser_power")==0){
+      /* total laser power used instead of fluence value */
+      getparam("laser_power", &laser_power, PARAM_REAL, 1, 1);
+    }
+else if (strcasecmp(token, "laser_reflectivity")==0){
+      /* reflectivity */
+      getparam("laser_reflectivity", &laser_reflectivity, PARAM_REAL, 1, 1);
+    }
+else if (strcasecmp(token, "laser_start_position")==0){
+      /* laser x-y-position to start from */
+      getparam("laser_start_position", &laser_start_position, PARAM_REAL, 2, 2);
+    }
+else if (strcasecmp(token, "laser_velocity")==0){
+      /* laser velocity in x-y-plane, angstrom per timestep */
+      getparam("laser_velocity", &laser_velocity, PARAM_REAL, 2, 2);
+    }
+#endif
+
 #ifdef LASERYZ
 else if (strcasecmp(token, "laser_sigma_w_y")==0){
       /* y-center of gaussian laser-pulse  */
@@ -3677,6 +3702,16 @@ void check_parameters_complete()
   if ( (laser_rescale_mode < 0) || (laser_rescale_mode > 4) ) {
     error("Parameter laser_rescale_mode must be a positive integer < 5 !");
   }
+
+#ifdef SLM
+  /* MYMOD FABIO LASER PARAMS */
+  if (laser_fwhm == 0.0){
+    error("Parameter laser_fwhm must be non-zero.");
+  }
+  else if (laser_reflectivity > 1.0 || laser_reflectivity < 0.0){
+    error("Parameter laser_reflectivity must be between 0.0 and 1.0.");
+  }
+#endif /* SLM */
 #endif /* LASER */
 #ifdef LASERYZ
 	if ( (laser_sigma_w_y == 0.0 ) || (laser_sigma_w_z == 0.0) ){
@@ -4410,8 +4445,16 @@ void broadcast_params() {
 #endif
 #ifdef LASER
   MPI_Bcast( &laser_rescale_mode,1,MPI_INT,0,MPI_COMM_WORLD);
-  MPI_Bcast( &laser_dir,  DIM , MPI_INT,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_mu,         1, REAL,  0, MPI_COMM_WORLD);
+#ifdef SLM
+  /* MYMOD FABIO LASER PARAMS */
+  MPI_Bcast( &laser_fwhm,  1 , REAL,  0, MPI_COMM_WORLD);
+  MPI_Bcast( &laser_power,  1 , REAL,  0, MPI_COMM_WORLD);
+  MPI_Bcast( &laser_reflectivity,  1 , REAL,  0, MPI_COMM_WORLD);
+  MPI_Bcast( &laser_start_position,  2 , REAL,  0, MPI_COMM_WORLD);
+  MPI_Bcast( &laser_velocity,  2 , REAL,  0, MPI_COMM_WORLD);
+#else
+  MPI_Bcast( &laser_dir,  DIM , MPI_INT,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_delta_temp, 1, REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_sigma_e,    1, REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_sigma_t,    1, REAL,  0, MPI_COMM_WORLD);
@@ -4419,13 +4462,14 @@ void broadcast_params() {
   MPI_Bcast( &laser_sigma_e1,    1, REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_sigma_t1,    1, REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_t_1,        1, REAL,  0, MPI_COMM_WORLD);
+#endif /* SLM */
 #ifdef LASERYZ
   MPI_Bcast( &laser_sigma_w_y,    1,    REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_sigma_w_z,    1,    REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_sigma_w0,     1,    REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &laser_tem_mode,     3, MPI_INT,  0, MPI_COMM_WORLD);
-#endif
-#endif
+#endif /* LASERYZ */
+#endif /* LASER */
 #ifdef PDECAY
   MPI_Bcast( &xipdecay,     1, REAL,  0, MPI_COMM_WORLD);
   MPI_Bcast( &ramp_fraction,1, REAL,  0, MPI_COMM_WORLD);
