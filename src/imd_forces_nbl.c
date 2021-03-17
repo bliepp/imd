@@ -60,8 +60,7 @@ void deallocate_nblist(void)
     printf("Size of neighbor table: %d MB\n", 
            nb_max * sizeof(int) / SQR(1024) );
 #endif
-  if (tb) free(tb);
-  tb = NULL;
+  FREE_PTR(tb);
   have_valid_nbl = 0;
 }
 
@@ -170,8 +169,9 @@ void make_nblist(void)
 
   /* (re-)allocate neighbor table */
   if (at >= at_max) {
-    free(tl);
-    free(cl_num);
+    FREE_PTR(tl);
+    FREE_PTR(cl_num);
+
     at_max = (int) (nbl_size * at);
     tl     = (int *) malloc(at_max * sizeof(int));
     cl_num = (int *) malloc(at_max * sizeof(int));
@@ -184,20 +184,22 @@ void make_nblist(void)
     tb = (int *) malloc(nb_max * sizeof(int));
   }
   else if (last_nbl_len * sqrt(nbl_size) > nb_max) {
-    free(tb);
+    FREE_PTR(tb);
     nb_max = (int  ) (nbl_size * last_nbl_len);
     tb     = (int *) malloc(nb_max * sizeof(int));
   }
 
 #ifdef LOADBALANCE
   if (lb_need_nbl_update == 1){
-	free(tl);
-	free(cl_num);
+	FREE_PTR(tl);
+	FREE_PTR(cl_num);
+
 	at_max = (int) (nbl_size * 2 * at);
 	tl     = (int *) malloc(at_max * sizeof(int));
 	cl_num = (int *) malloc(at_max * sizeof(int));
 
-	free(tb);
+	FREE_PTR(tb);
+
 	lb_need_nbl_update = 0;
 	int reqSize = (int)(nbl_size * estimate_nblist_size());
 	nb_max = MAX(reqSize, NBLMINLEN);

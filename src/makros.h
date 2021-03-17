@@ -468,6 +468,9 @@ inline static real SQR(real x)
 #define PTR_VV  PTR_3D_VV
 #endif
 
+/* shorthand for freeing a pointer safely */
+#define FREE_PTR(ptr) if (ptr) free(ptr); ptr = NULL
+
 /* different versions of math functions for float and double */
 #ifdef DOUBLE
 #define FLOOR floor
