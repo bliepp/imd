@@ -167,7 +167,12 @@ void fix_cells(void)
               num_vsort[VSORTE(p,l)] -= nclones;
               warning("Atom jumped multiple CPUs");
 #else
+#ifdef SLM
+              // MYMOD FABIO PREVENT ERROR ABORTING THE SIMULATION
+              warning("Atom jumped multiple CPUs");
+#else
               error("Atom jumped multiple CPUs");
+#endif
 #endif
 	    }
 #endif /* not LOADBALANCE*/

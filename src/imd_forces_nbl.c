@@ -1996,13 +1996,16 @@ real pconst_i=SQR(charge[it])+SQR(dp_alpha[it]);
   /* add forces back to original cells/cpus */
   send_forces(add_forces,pack_forces,unpack_forces);
 
-  /* MYMOD DKLEINMOD GRAVITY */
+#ifdef SLM_ // change to SLM if needed, don't know if needed with the implementation in main loop
+  //printf("Hello form imd_forces_nbl.c");
+  /* MYMOD FABIO GRAVITY AFTER DKLEIN */
   for (k=0; k<ncells; k++) {
       cell *p = cell_array + cnbrs[k].np;
       for (i=0; i<p->n; i++) {
           KRAFT(p,i,Z) -= MASSE(p,i) * 1.016633844*(1e-17 * 10000000);
       }
   }
+#endif
 
 }
 

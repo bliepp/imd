@@ -404,6 +404,18 @@ int nyeDone;
 #else
       calc_forces(steps);
 #endif
+
+#ifdef SLM
+  /* MYMOD FABIO GRAVITY AFTER DKLEIN */
+  for (k=0; k<ncells; k++) {
+      int i;
+      cell *p = cell_array + k;
+      for (i=0; i<p->n; i++) {
+          KRAFT(p,i,Z) -= MASSE(p,i) * 1.016633844*(1e-17 * 10000000);
+      }
+  }
+#endif
+
 /* #ifdef BBOOST
     calc_bondboost(steps);
 #endif */
